@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AppBar, Toolbar, Typography } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, Link } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = {
@@ -8,20 +8,33 @@ const styles = {
     },
 };
 
-function Header(props) {
-    const { classes } = props;
+class Header extends Component {
 
-    return (
-        <div className={classes.root}>
-            <AppBar position="static">
-                <Toolbar>
-                    <Typography variant="h4" color="inherit" className={classes.grow}>
-                        Webtrekk Users
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-        </div>
-    )
+    handleTitleClick = () => {
+        console.log(this);
+
+        const { history } = this.props;
+
+        console.log('hello?');
+
+        history.push(`/`);
+    }
+
+    render() {
+        const { classes } = this.props;
+        
+        return (
+            <div className={classes.root}>
+                <AppBar position="static">
+                    <Toolbar>
+                        <Typography variant="h4" color="inherit" className={classes.grow} onClick={this.handleTitleClick}>
+                            Webtrekk Users
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+            </div>
+        )
+    }
 }
 
 export default withStyles(styles)(Header);

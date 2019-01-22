@@ -1,31 +1,34 @@
-import React, { Component, Fragment } from 'react';
-import { Paper, List, ListItem, Typography, Grid, TextField, Button, CircularProgress, MenuItem, Table, TableBody, TableCell, TableRow, TableHead } from '@material-ui/core';
+import React, { Component } from 'react';
+import { Typography, Grid, TextField, Button, CircularProgress, MenuItem, Paper } from '@material-ui/core';
+import { fetchUserData, saveUserData } from '../utils/utils';
 import { withStyles } from '@material-ui/core/styles';
 import moment from 'moment';
-import { fetchUserData, saveUserData } from '../utils/utils';
 
-// TODO split out loading component
-
-const styles = () => ({
+const styles = (theme) => ({
     root: {
-        margin: 20,
-        padding: 20
+        margin: theme.spacing.unit * 3,
+        flexGrow: 1
     },
     item: {
-        width: '100%',
-        padding: 20
+        width: '90%',
+        margin: theme.spacing.unit * 3
     },
     button: {
         margin: 10
     },
-    loadingContainer: {
-        margin: 40,
+    container: {
+        marginTop: theme.spacing.unit * 5,
         display: 'flex',
         justifyContent: 'center',
-        width: '100%',
-        margin: 'auto'
+        width: '100%'
     },
-    loading: {
+    paper: {
+        width: '100%',
+        marginTop: theme.spacing.unit * 3,
+        overflowX: 'auto'
+    },
+    buttons: {
+        marginTop: theme.spacing.unit * 3,
     }
 })
 
@@ -48,19 +51,15 @@ class User extends Component {
     }
 
     handleEditClick = () => {
-        this.setState(() => ({
-            readOnly: !this.state.readOnly
+        this.setState(prevState => ({
+            readOnly: !prevState.readOnly
         }));
     }
 
-    // TODO refactor and test some of these functions
     handleSaveClick = () => {
         const { create } = this.props;
         const { user } = this.state;
 
-        // TODO get a better way of getting users in here
-        // either in state and just store the one user along side?
-        // function to format the users
         saveUserData(user);
 
         create
@@ -68,32 +67,35 @@ class User extends Component {
             : console.log('UPDATE');
     }
 
+    // TODO convert date back
     formatDate = (date) => {
-        const formattedDate = moment(date, "YYYYMMDD").fromNow();
+        const formattedDate = moment(date).format('YYYY-MM-DD[T]HH:mm:ss');
+
         return formattedDate;
     }
 
     handleNameChange = (e, property) => {
-        this.setState({
-            ...this.state,
+        this.setState(prevState => ({
+            ...prevState,
             user: {
-                ...this.state.user,
+                ...prevState.user,
                 name: {
-                    ...this.state.user.name,
+                    ...prevState.name,
                     [property]: e.target.value
                 }
             }
-        });
+        }));
     }
 
     handleUserPropertyChange = (e, property) => {
-        this.setState({
-            ...this.state,
+        const val = e.target.value;
+        this.setState(prevState => ({
+            ...prevState,
             user: {
-                ...this.state.user,
-                [property]: e.target.value
+                ...prevState.user,
+                [property]: val
             }
-        });
+        }));
     }
 
     getUser = (users, customerID) => {
@@ -104,6 +106,7 @@ class User extends Component {
 
     inputIsValid = () => {
         const { user } = this.state;
+
         return user.name.first && user.name.last ? true : false;
     }
 
@@ -118,30 +121,30 @@ class User extends Component {
 
         const users = fetchUserData();
 
-        if (!create) {
+        if (create) {
+            this.setState(prevState => ({
+                ...prevState,
+                loading: false,
+                title: 'Create New User'
+            }));
+        } else {
             const customerID = parseInt(match.params.customerID, 10);
             const user = this.getUser(users, customerID);
 
-            user
-                ? (
-                    this.setState({
-                        ...this.state,
-                        loading: false,
-                        title: `${user.name.first} ${user.name.last}`,
-                        user
-                    }))
-                : (
-                    this.setState({
-                        ...this.state,
-                        loading: false,
-                        user: null
-                    }));
-        } else {
-            this.setState({
-                ...this.state,
-                loading: false,
-                title: 'Create New User'
-            })
+            if (user) {
+                this.setState(prevState => ({
+                    ...prevState,
+                    loading: false,
+                    title: `${user.name.first} ${user.name.last}`,
+                    user
+                }));
+            } else {
+                this.setState(prevState => ({
+                    ...prevState,
+                    loading: false,
+                    user: null
+                }));
+            }
         }
     }
 
@@ -151,29 +154,34 @@ class User extends Component {
 
         const genderOptions = ['', 'm', 'f'];
 
-        const isValid = this.inputIsValid();
+        if (loading) {
+            return (
+                <div className={classes.container}>
+                    <CircularProgress />
+                </div>
+            );
+        }
 
-        return (
-            loading
-                ? (
-                    <div className={classes.loadingContainer}>
-                        <CircularProgress className={classes.loading} />
-                    </div>
-                )
-                : user === null
-                    ? <Typography>User not found</Typography> //TODO new styled component
-                    : (
-                        <Grid container className={classes.root}>
-                            <Grid item xs={12}>
-                                <Typography variant="h6" color="inherit" className={classes.grow}>{title}</Typography>
-                            </Grid>
-                            {/* TODO reactive */}
-                            <Grid item xs={12} md={5} >
+        if (user === null) {
+            return (
+                <div className={classes.container}>
+                    <Typography variant="h4">User not found</Typography>
+                </div>
+            );
+        } else {
+            return (
+                <div className={classes.root}>
+                    <Typography variant="h6" color="inherit" className={classes.grow}>
+                        {title}
+                    </Typography>
+                    <Paper className={classes.paper}>
+                        <Grid container>
+                            <Grid item xs={12} md={6} >
                                 <TextField
+                                    fullWidth
                                     disabled={readOnly}
                                     error={this.isFieldValid(user.name.first)}
                                     className={classes.item}
-                                    fullWidth
                                     name="firstName"
                                     label="First Name"
                                     value={user.name.first}
@@ -181,12 +189,12 @@ class User extends Component {
                                     onChange={e => this.handleNameChange(e, 'first')}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={5}>
+                            <Grid item xs={12} md={6}>
                                 <TextField
+                                    fullWidth
                                     disabled={readOnly}
                                     error={this.isFieldValid(user.name.last)}
                                     className={classes.item}
-                                    fullWidth
                                     name="lastName"
                                     label="Last Name"
                                     value={user.name.last}
@@ -194,10 +202,10 @@ class User extends Component {
                                     onChange={e => this.handleNameChange(e, 'last')}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={5}>
+                            <Grid item xs={12} md={6}>
                                 <TextField
-                                    disabled={readOnly}
                                     fullWidth
+                                    disabled={readOnly}
                                     className={classes.item}
                                     name="dob"
                                     label="Date of Birth"
@@ -207,17 +215,16 @@ class User extends Component {
                                     onChange={e => this.handleUserPropertyChange(e, 'birthday')}
                                 />
                             </Grid>
-                            <Grid item xs={12} md={5}>
-                                {/* TODO refator to new file? */}
+                            <Grid item xs={12} md={6}>
                                 <TextField
-                                    disabled={readOnly}
+                                    select
                                     fullWidth
+                                    disabled={readOnly}
                                     className={classes.item}
                                     name="gender"
                                     label="Gender"
                                     value={user.gender}
                                     margin="normal"
-                                    select
                                     onChange={e => this.handleUserPropertyChange(e, 'gender')}
                                 >
                                     {genderOptions.map(option => (
@@ -227,58 +234,57 @@ class User extends Component {
                                     ))}
                                 </TextField>
                             </Grid>
-                            {!create &&
-                                <Fragment>
-                                    <Grid item xs={12} md={5}>
-                                        <TextField
-                                            fullWidth
-                                            disabled
-                                            className={classes.item}
-                                            name="lastContact"
-                                            label="Last Contact"
-                                            value={this.formatDate(user.lastContact)}
-                                            margin="normal"
-                                            onChange={e => this.handleUserPropertyChange(e, 'lastContact')}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={5}>
-                                        <TextField
-                                            fullWidth
-                                            disabled
-                                            className={classes.item}
-                                            name="customerLifetimeValue"
-                                            label="Customer Lifetime Value"
-                                            value={user.customerLifetimeValue}
-                                            margin="normal"
-                                            onChange={e => this.handleUserPropertyChange(e, 'customerLifetimeValue')}
-                                        />
-                                    </Grid>
-                                </Fragment>
-                            }
-                            <Grid item xs={12}>
-                                <Button
-                                    className={classes.button}
-                                    id="edit-button"
-                                    color="primary"
-                                    variant="outlined"
-                                    onClick={this.handleEditClick}
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    className={classes.button}
-                                    id="save-button"
-                                    color="secondary"
-                                    variant="outlined"
-                                    onClick={this.handleSaveClick}
-                                    disabled={!isValid}
-                                >
-                                    Save
-                                </Button>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    disabled={readOnly}
+                                    className={classes.item}
+                                    name="lastContact"
+                                    label="Last Contact"
+                                    type="datetime-local"
+                                    value={this.formatDate(user.lastContact)}
+                                    margin="normal"
+                                    onChange={e => this.handleUserPropertyChange(e, 'lastContact')}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    disabled={readOnly}
+                                    className={classes.item}
+                                    name="customerLifetimeValue"
+                                    label="Customer Lifetime Value"
+                                    value={user.customerLifetimeValue}
+                                    margin="normal"
+                                    onChange={e => this.handleUserPropertyChange(e, 'customerLifetimeValue')}
+                                />
                             </Grid>
                         </Grid>
-                    )
-        )
+                    </Paper>
+                    <div className={classes.buttons}>
+                        <Button
+                            className={classes.button}
+                            id="edit-button"
+                            color="primary"
+                            variant="outlined"
+                            onClick={this.handleEditClick}
+                        >
+                            Edit
+                        </Button>
+                        <Button
+                            className={classes.button}
+                            id="save-button"
+                            color="secondary"
+                            variant="outlined"
+                            onClick={this.handleSaveClick}
+                            disabled={!this.inputIsValid()}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                </div>
+            )
+        }
     }
 }
 

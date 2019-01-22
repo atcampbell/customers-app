@@ -1,8 +1,12 @@
-import data from '../../data/data.json';
+// import data from '../../data/data.json';
+
+export function sum(a, b) {
+    return a + b;
+}
 
 // TODO update to express
 export function fetchUserData() {
-    return data;
+    return 'data';
 }
 
 export function saveUserData(users) {

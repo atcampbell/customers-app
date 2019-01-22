@@ -16,7 +16,7 @@
     "start": "webpack-dev-server --open",
     "build": "NODE_ENV='production' webpack",
     "firebase-init": "firebase login && firebase init",
-    "deploy": "npm run build && firebase deploy"
+    "test": ""
   },
   "keywords": [],
   "author": "",
@@ -34,7 +34,7 @@
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.0",
+    "@babel/core": "^7.2.2",
     "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-react": "^7.0.0",
