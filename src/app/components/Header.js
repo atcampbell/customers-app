@@ -10,6 +10,7 @@ const styles = {
 
 class Header extends Component {
 
+    // TODO remove this
     handleTitleClick = () => {
         console.log(this);
 
