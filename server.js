@@ -13,11 +13,11 @@ app.use(bodyParser.json());
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 app.get('/customer-data', (req, res) => {
-    fs.readFile('./data/data.json', (err, data) => {
+    fs.readFile('./customer-data.json', (err, data) => {
         if (err) {
             res.status(500).send('Internal service error');
         } else {
-            const data = fs.readFileSync('./data/data.json');
+            const data = fs.readFileSync('./customer-data.json');
             res.send(data);
         }
     });
@@ -25,7 +25,7 @@ app.get('/customer-data', (req, res) => {
 
 app.post('/customer-data', (req, res) => {
     const data = JSON.stringify(req.body);
-    fs.writeFile('./data/data.json', data, (err) => {
+    fs.writeFile('./customer-data.json', data, (err) => {
         if (err) {
             res.status(500).send('Internal service error');
         } else {
