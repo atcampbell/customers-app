@@ -24,7 +24,7 @@ class CustomerContainer extends Component {
         this.setState(prevState => ({
             ...prevState,
             loading: false,
-            users: customers
+            customers
         }));
     };
 

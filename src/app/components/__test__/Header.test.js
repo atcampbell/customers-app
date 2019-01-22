@@ -19,7 +19,7 @@ describe('<Header />', () => {
 
         it('should render menu bar text', () => {
             expect(getTypography()).toHaveLength(1);
-            expect(getTypography().props().children).toEqual('Webtrekk Users');
+            expect(getTypography().props().children).toEqual('Webtrekk Customers');
         });
     });
 });

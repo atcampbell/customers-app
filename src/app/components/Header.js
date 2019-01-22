@@ -16,7 +16,7 @@ function Header(props) {
             <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h4" color="inherit" className={classes.root}>
-                        Webtrekk Users
+                        Webtrekk Customers
                     </Typography>
                 </Toolbar>
             </AppBar>
