@@ -1,25 +1,19 @@
 import React, { Component } from 'react';
-import { Button, Table, TableBody, TableCell, TableRow, TableHead } from '@material-ui/core';
+import { Table, TableBody, TableCell, TableRow, TableHead } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import UserTableItem from './UserTableItem';
+import CustomerTableItem from './CustomerTableItem';
 
 const styles = {
     root: {
         minWidth: 700
     }
-}
+};
 
-class UserTable extends Component {
+class CustomerTable extends Component {
     render() {
-        const { users, classes } = this.props;
+        const { customers, classes } = this.props;
 
         return (
-
-            // {/* if no users display warning */}
-            // {!users || !users.length
-            //     ? <div>No Users</div>
-            //     : <div>Eres the table</div>}
-
             <Table className={classes.root}>
                 <TableHead>
                     <TableRow>
@@ -32,13 +26,17 @@ class UserTable extends Component {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {users.map(user => (
-                        <UserTableItem key={user.customerID} user={user} {...this.props}/>
+                    {customers.map(customer => (
+                        <CustomerTableItem
+                            key={customer.customerID}
+                            customer={customer}
+                            {...this.props}
+                        />
                     ))}
                 </TableBody>
             </Table>
-        )
+        );
     }
 }
 
-export default withStyles(styles)(UserTable);
+export default withStyles(styles)(CustomerTable);

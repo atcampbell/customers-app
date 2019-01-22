@@ -13,7 +13,9 @@
     ]
   },
   "jest": {
-    "setupFiles": ["./setup-enzyme.js"]
+    "setupFiles": [
+      "./setup-enzyme.js"
+    ]
   },
   "scripts": {
     "start": "webpack-dev-server --open",
